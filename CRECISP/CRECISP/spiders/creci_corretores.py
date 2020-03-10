@@ -36,7 +36,7 @@ class CreciCorretoresSpider(scrapy.Spider):
         info = response.css('.col-sm-9 div span::text').getall()
         info_dict = {key: value for key, value in zip(titulos, info)}
 
-        if name:
+        if nome:
             yield{
                 'Nome': nome,
                 'CRECI': info_dict.get('CRECI'),
