@@ -7,12 +7,11 @@ class CrecispSpider(scrapy.Spider):
 
     def start_requests(self):
         self.cookies = {
-            'ASP.NET_SessionId': 'qmgdpyi0p0zdbxnbq4sv5zjb',
-            '_ga': 'GA1.3.588993807.1583765464',
-            '_gid': 'GA1.3.1192266597.1583765464',
+            '_ga': 'GA1.3.760870456.1582981260',
+            'ASP.NET_SessionId': 'frzpillqyf5sqn5cpsiqjn0e',
+            '_gid': 'GA1.3.520723151.1583815486',
             '_gat': '1',
         }
-
         self.headers = {
             'Connection': 'keep-alive',
             'Cache-Control': 'max-age=0',
@@ -32,7 +31,7 @@ class CrecispSpider(scrapy.Spider):
             b'Date': b'Mon, 09 Mar 2020 15:18:46 GMT'
         }
 
-        url = 'https://www.crecisp.gov.br/cidadao/listadecorretores?page=1844'
+        url = 'https://www.crecisp.gov.br/cidadao/listadecorretores?page=4144'
 
         yield scrapy.Request(url, cookies=self.cookies, dont_filter=True,
                              callback=self.get_crecis, headers=self.headers)
