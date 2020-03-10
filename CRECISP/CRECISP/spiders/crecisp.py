@@ -32,15 +32,15 @@ class CrecispSpider(scrapy.Spider):
             b'Date': b'Mon, 09 Mar 2020 15:18:46 GMT'
         }
 
-        url = 'https://www.crecisp.gov.br/cidadao/listadecorretores?page=7748'
+        url = 'https://www.crecisp.gov.br/cidadao/listadecorretores'
 
         yield scrapy.Request(url, cookies=self.cookies, dont_filter=True,
                              callback=self.get_crecis, headers=self.headers)
 
     def get_crecis(self, response):
         url = response.url
-        proxima = ''#(response.css('a.navigate:contains(Próximo)::attr(href)')
-                  # .get())
+        proxima = (response.css('a.navigate:contains(Próximo)::attr(href)')
+                  .get())
         crecis_all = response.css('.col-lg-4.broker-details')
         for creci in crecis_all:
             creci = creci.css('div span::text').getall()
