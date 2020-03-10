@@ -1,0 +1,49 @@
+    def start_requests(self):
+        self.cookies = {
+            '_ga': 'GA1.3.1727821127.1583766746',
+            '_gid': 'GA1.3.828506562.1583766746',
+            '_gat': '1',
+            'ASP.NET_SessionId': 'sw2mpx3zy2uqyjokigh5w03f',
+        }
+
+        url = 'http://crecisp.gov.br/cidadao/listadecorretores/'
+
+        yield scrapy.Request(url, cookies=self.cookies, dont_filter=True,
+                             callback=self.get_crecis)
+
+    def get_crecis(self, response):
+        proxima = (response.css('a.navigate:contains(Próximo)::attr(href)')
+                   .get())
+        url_corretor = 'https://www.crecisp.gov.br/cidadao/corretordetalhes'
+        crecis_all = response.css('.col-lg-4.broker-details')
+        # crecis = []
+        for creci in crecis_all:
+            creci = creci.css('div span::text').getall()
+            if creci[1].strip() == 'Ativo':
+                # crecis.append(creci[0].strip())
+                print(creci[0])
+                formdata = {'registerNumber': creci[0].strip()}
+                yield scrapy.FormRequest(url_corretor, formdata=formdata,
+                                         dont_filter=True, cookies=self.cookies,
+                                         callback=self.get_corretores)
+        if proxima:
+            url = f'https://www.crecisp.gov.br{proxima}'
+            yield scrapy.Request(url, cookies=cookies, dont_filter=True,
+                                 callback=self.get_crecis)
+
+    def get_corretores(self, response):
+        nome = response.css('.col-sm-9 h3::text').get()
+        titulos = response.css('.col-sm-9 div strong label::text').getall()
+        info = response.css('.col-sm-9 div span::text').getall()
+        info_dict = {key: value for key, value in zip(titulos, info)}
+
+        yield{
+            'Nome': nome,
+            'CRECI': info_dict.get('CRECI'),
+            'Situação': info_dict.get('Situação'),
+            'Município': info_dict.get('Município'),
+            'UF': info_dict.get('UF'),
+            'Contato': info_dict.get('Contato(s)'),
+            'E-Mail': info_dict.get('E-Mail'),
+            'E-Mail Oficial': info_dict.get('E-Mail Oficial')
+        }
