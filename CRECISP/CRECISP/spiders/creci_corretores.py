@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import csv
 
 
 class CreciCorretoresSpider(scrapy.Spider):
@@ -7,21 +8,24 @@ class CreciCorretoresSpider(scrapy.Spider):
 
     def start_requests(self):
         self.cookies = {
-            '_ga': 'GA1.3.2017159564.1583724558',
-            '_gid': 'GA1.3.445123655.1583724558',
+            '_ga': 'GA1.3.760870456.1582981260',
+            'ASP.NET_SessionId': 'frzpillqyf5sqn5cpsiqjn0e',
+            '_gid': 'GA1.3.520723151.1583815486',
             '_gat': '1',
-            'ASP.NET_SessionId': 'qakeavvpialpd3x1avtk4dzv',
         }
+
         url = 'https://www.crecisp.gov.br/cidadao/corretordetalhes'
 
-        with open('eggs.csv', 'r') as csvfile:
+        with open('crecisp.csv', 'r') as csvfile:
             spamwriter = csv.reader(csvfile)
             for creci in spamwriter:
-                creci = creci[0].replace('|', '')
-                formdata = {'registerNumber': creci.strip()}
-                yield scrapy.FormRequest(url, formdata=formdata,   
-                                         dont_filter=True, cookies=self.cookies,
-                                         callback=self.get_corretores)
+                if creci[1].strip() == 'Ativo':
+                    formdata = {'registerNumber': creci[0].strip()}
+                    yield scrapy.FormRequest(url, formdata=formdata,   
+                                            dont_filter=True, cookies=self.cookies,
+                                            callback=self.get_corretores)
+                else:
+                    continue
         def get_corretores(self, response):
             nome = response.css('.col-sm-9 h3::text').get()
             titulos = response.css('.col-sm-9 div strong label::text').getall()
